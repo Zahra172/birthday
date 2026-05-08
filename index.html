@@ -1033,26 +1033,8 @@ body:hover #cursor { width: 22px; height: 22px; }
         <div class="polaroid-img-placeholder"><span>🌙</span>img4.jpg</div>
         <div class="polaroid-caption">Late night talks 🌙</div>
       </div>
-      <div class="polaroid" style="--rot:-1deg;--delay:.5s">
-        <div class="polaroid-tape"></div>
-        <div class="polaroid-img-placeholder"><span>🦋</span>img5.jpg</div>
-        <div class="polaroid-caption">Butterflies & you 🦋</div>
-      </div>
-      <div class="polaroid" style="--rot:2.5deg;--delay:.6s">
-        <div class="polaroid-tape"></div>
-        <div class="polaroid-img-placeholder"><span>🌷</span>img6.jpg</div>
-        <div class="polaroid-caption">In full bloom 🌷</div>
-      </div>
-      <div class="polaroid" style="--rot:-2.5deg;--delay:.7s">
-        <div class="polaroid-tape"></div>
-        <div class="polaroid-img-placeholder"><span>💫</span>img7.jpg</div>
-        <div class="polaroid-caption">Golden hour you 💫</div>
-      </div>
-      <div class="polaroid" style="--rot:1.5deg;--delay:.8s">
-        <div class="polaroid-tape"></div>
-        <div class="polaroid-img-placeholder"><span>🎀</span>img8.jpg</div>
-        <div class="polaroid-caption">My everything 🎀</div>
-      </div>
+
+     
     </div>
   </div>
 </section>
@@ -1325,49 +1307,38 @@ function startTyping() {
 }
 
 /* ─── MUSIC (Web Audio API — gentle birthday melody) ─── */
-let audioCtx = null, musicPlaying = false, musicNodes = [];
 
+let musicPlaying = false;
+let audioCtx;
 function toggleMusic() {
+
+  const song = document.getElementById('birthday-song');
   const btn = document.getElementById('music-btn');
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (musicPlaying) {
-    musicNodes.forEach(n => { try { n.stop(); } catch(e){} });
-    musicNodes = [];
+
+  if (!musicPlaying) {
+
+    // start from 1:35
+    song.currentTime = 98;
+
+    song.play()
+      .then(() => {
+        musicPlaying = true;
+        btn.textContent = '🎵 Pause Music';
+      })
+      .catch(err => {
+        console.log("Audio error:", err);
+        alert("Couldn't play the song 💔");
+      });
+
+  } else {
+
+    song.pause();
     musicPlaying = false;
     btn.textContent = '🎵 Play Our Song';
-  } else {
-    playMelody();
-    musicPlaying = true;
-    btn.textContent = '🎵 Pause Music';
+
   }
 }
 
-function playNote(freq, start, dur, gain=.15) {
-  const osc  = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
-  osc.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(freq, audioCtx.currentTime + start);
-  gainNode.gain.setValueAtTime(0, audioCtx.currentTime + start);
-  gainNode.gain.linearRampToValueAtTime(gain, audioCtx.currentTime + start + .05);
-  gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + start + dur - .05);
-  osc.start(audioCtx.currentTime + start);
-  osc.stop(audioCtx.currentTime + start + dur);
-  musicNodes.push(osc);
-}
-
-function playMelody() {
-  // Happy Birthday melody (simplified)
-  const notes = [
-    [261.63,.0,.3],[261.63,.3,.15],[293.66,.45,.45],[261.63,.9,.45],[349.23,1.35,.45],[329.63,1.8,.9],
-    [261.63,2.7,.3],[261.63,3.0,.15],[293.66,3.15,.45],[261.63,3.6,.45],[392.00,4.05,.45],[349.23,4.5,.9],
-    [261.63,5.4,.3],[261.63,5.7,.15],[523.25,5.85,.45],[440.00,6.3,.45],[349.23,6.75,.3],[329.63,7.05,.3],[293.66,7.35,.9],
-    [466.16,8.25,.3],[466.16,8.55,.15],[440.00,8.7,.45],[349.23,9.15,.45],[392.00,9.6,.45],[349.23,10.05,1.2]
-  ];
-  notes.forEach(([f,s,d]) => playNote(f,s,d,.12));
-  setTimeout(() => { if (musicPlaying) playMelody(); }, 11500);
-}
 
 /* ─── BLOW CANDLES ─── */
 let candlesBlown = false;
@@ -1607,5 +1578,8 @@ window.addEventListener('load', () => {
 });
 
 </script>
+<audio id="birthday-song" loop>
+  <source src="KolYoumAhlaYoum.mp3" type="audio/mpeg">
+</audio>
 </body>
 </html>
